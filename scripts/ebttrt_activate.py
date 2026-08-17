@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
 import stat
 import sys
 from pathlib import Path
@@ -104,6 +105,17 @@ def chmod_exec(path: Path) -> None:
         path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
 
+def remove_stale_ebttrl_skill() -> str | None:
+    stale = grok_home() / "skills" / "ebttrl-activate"
+    if not stale.exists():
+        return None
+    if stale.is_dir():
+        shutil.rmtree(stale)
+    else:
+        stale.unlink()
+    return f"removed stale {stale}"
+
+
 def install_user_skill(repo: Path) -> Path:
     src = repo / "skills" / "ebttrt-activate" / "SKILL.md"
     dest_dir = grok_home() / "skills" / "ebttrt-activate"
@@ -191,6 +203,9 @@ def cmd_activate() -> int:
     print(f"repo:    {repo}")
     rc = cmd_install()
     print(ensure_zsh_path())
+    stale = remove_stale_ebttrl_skill()
+    if stale:
+        print(stale)
     skill = install_user_skill(repo)
     print(f"skill:   {skill}")
     hoheit = find_hoheit()

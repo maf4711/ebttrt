@@ -127,6 +127,14 @@ class ActivateTests(Tmp):
         self.assertTrue(os.access(self.hoheit / "scripts" / "hoheit-prove", os.X_OK))
         self.assertTrue((self.hoheit / ".ebttrt.json").is_file())
 
+    def test_activate_removes_stale_ebttrl_skill(self) -> None:
+        leftover = self.home / "skills" / "ebttrl-activate"
+        leftover.mkdir(parents=True)
+        (leftover / "SKILL.md").write_text("# old\n", encoding="utf-8")
+        self.assertEqual(act.cmd_activate(), 0)
+        self.assertFalse(leftover.exists())
+        self.assertTrue((self.home / "skills" / "ebttrt-activate" / "SKILL.md").is_file())
+
     def test_activate_is_idempotent(self) -> None:
         self.assertEqual(act.cmd_activate(), 0)
         self.assertEqual(act.cmd_activate(), 0)
