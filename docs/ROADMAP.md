@@ -97,7 +97,7 @@ A green `echo ok` or a stale-but-matching digest still ships.
 
 ## Phase Q5 — Reproducible activate (0.8)
 
-**Gap:** Other Mac = rsync. No commit identity. Receipts cannot name a released ebttrl.
+**Gap:** Other Mac = clone `maf4711/ebttrl` (private) then `ebttrl activate`. Receipts still cannot name a released ebttrl until there is a tag.
 
 **Do**
 
