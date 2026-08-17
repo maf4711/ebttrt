@@ -1,0 +1,72 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bin/run.sh session-start",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bin/run.sh session-end",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|run_terminal_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bin/run.sh pretool",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|search_replace",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bin/run.sh posttool",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bin/run.sh precompact",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bin/run.sh stop",
+            "timeout": 8
+          }
+        ]
+      }
+    ]
+  }
+}
