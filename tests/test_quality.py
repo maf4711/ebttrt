@@ -200,7 +200,7 @@ class VersionQuality(Tmp):
         file_v, plug_v, code_v = ebttrt_lib.declared_versions(ROOT)
         self.assertEqual(file_v, plug_v)
         self.assertEqual(file_v, code_v)
-        self.assertEqual(code_v, "0.9.0")
+        self.assertEqual(code_v, "1.0.0")
 
     def test_doctor_symlink_and_version(self) -> None:
         self.assertEqual(ebttrt.cmd_install(), 0)

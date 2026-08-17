@@ -97,14 +97,14 @@ A green `echo ok` or a stale-but-matching digest still ships.
 
 ## Phase Q5 — Reproducible activate (0.8)
 
-**Gap:** Other Mac = clone `maf4711/ebttrt` (private) then `ebttrt activate`. Receipts still cannot name a released ebttrt until there is a tag.
+**Gap:** Other Mac = clone `maf4711/ebttrt` then `ebttrt activate`. Receipts still cannot name a released ebttrt until there is a tag.
 
 **Do**
 
 - Git history + version tag for ebttrt. `activate` still works from a copy.
 - Receipts store `ebttrt` version (already) **and** plugin path digest.
 - `doctor` fails if plugin symlink ≠ discovered repo, or VERSION ≠ `plugin.json`.
-- Still no invented public URL. Remote only if you add one.
+- Public URL is `https://github.com/maf4711/ebttrt.git`. No invented hosts.
 
 **Done when**
 
@@ -133,6 +133,19 @@ One phase at a time. Each phase: tests first, then CLI, then the matching skill 
 - `grok plugin validate .` green.
 - Rule file not longer than now.
 - Skill count may grow by **at most one** (only if a phase needs a slash entry that is not a prompt essay).
+
+## Phase Q6 — Public, then four smarter cuts (1.0 → next)
+
+**1.0.0** is the first public tag: slogan, clone URL, GitHub Action prove.
+
+Next, in this order — still not a catalog:
+
+| Cut | Smarter | Done when |
+|---|---|---|
+| Q6a Prove chain | Discover tests **then** types/lint when present | Default chain ≥2 cmds on a typed repo; `"true"` warns |
+| Q6b Review hunks | `review.json` stores `git diff --stat` + paths | Missing hunks on a multi-file tree block `done` |
+| Q6c Fail line | Last prove fail: one sanitized line in the 1.8k card | Inject stays ≤1800; no secret stdout |
+| Q6d Instinct decay | Unused 30d drops; improve still needs 2 receipts | Tests: stale 0.5 → 0.3; no new skill files |
 
 ## Out of this roadmap
 

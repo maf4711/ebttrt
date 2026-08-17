@@ -1,7 +1,7 @@
 {
   "name": "ebttrt",
   "description": "Even Better Than The Real Thing — Grok-native agent harness. Thin loop, on-demand skills, receipts, shield. Not an ECC clone.",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "author": {
     "name": "ebttrt"
   },

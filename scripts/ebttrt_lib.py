@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-VERSION = "0.9.0"
+VERSION = "1.0.0"
 LOOP = ("plan", "test", "implement", "review", "verify", "remember", "improve")
 MAX_CONTEXT_CHARS = 6000
 INJECT_CONTEXT_CHARS = 1800
