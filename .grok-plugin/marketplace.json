@@ -9,7 +9,7 @@
       "name": "ebttrl",
       "description": "Thin Grok harness: plan → test → implement → review → verify → remember → improve",
       "category": "development",
-      "version": "0.3.0",
+      "version": "0.8.0",
       "source": {
         "type": "local",
         "path": "."
