@@ -1,4 +1,4 @@
-# ebttrl quality roadmap
+# ebttrt quality roadmap
 
 Quality = a claim is true, bound to source, and cheap to check.
 Not more skills. Not a second ECC.
@@ -23,7 +23,7 @@ If a change does not move one of those four, it is out of scope.
 - Permanent test gate on every turn
 - Cross-IDE OS (Claude / Cursor / Codex)
 - Own orchestrator next to Ruflo
-- Growing `rules/ebttrl-loop.md` into a playbook
+- Growing `rules/ebttrt-loop.md` into a playbook
 
 Reuse Superpowers, Ruflo, project `AGENTS.md`. Promote only earned instincts.
 
@@ -36,7 +36,7 @@ A green `echo ok` or a stale-but-matching digest still ships.
 
 **Do**
 
-- `.ebttrl.json` may list `prove` as string **or** `["cmd1", "cmd2"]` (tests, then types/lint).
+- `.ebttrt.json` may list `prove` as string **or** `["cmd1", "cmd2"]` (tests, then types/lint).
 - Refuse `done` if last prove is missing, failed, or tree digest drifted.
 - Record each command’s argv, exit, digest, duration. No secret stdout in receipts.
 - `consult` names the prove chain, not a vibe.
@@ -45,11 +45,11 @@ A green `echo ok` or a stale-but-matching digest still ships.
 
 - Unit tests: multi-command prove, stale digest blocks `done`, empty prove config still discovers.
 - A workspace with only `"prove": "true"` fails doctor/consult with a warning, does not block if the user set it on purpose.
-- `ebttrl eval` stays green.
+- `ebttrt eval` stays green.
 
 ## Phase Q2 — Instincts must be earned (0.5 → in 0.8)
 
-**Gap:** `ebttrl remember` appends anything. Improve *says* “twice”; the CLI does not check.
+**Gap:** `ebttrt remember` appends anything. Improve *says* “twice”; the CLI does not check.
 
 **Do**
 
@@ -69,10 +69,10 @@ A green `echo ok` or a stale-but-matching digest still ships.
 
 **Do**
 
-- `ebttrl review` writes `review.json` (verdict, findings, diff-stat, source digest).
+- `ebttrt review` writes `review.json` (verdict, findings, diff-stat, source digest).
 - `remember` / `done` refuse if last review is `revise` with critical/high, or digest drifted since review.
 - One-file fix may skip review (already allowed). Multi-file or new public API may not.
-- Skill stays short: spawn `ebttrl-reviewer`, grade the diff, write the file. No rewrite-in-review.
+- Skill stays short: spawn `ebttrt-reviewer`, grade the diff, write the file. No rewrite-in-review.
 
 **Done when**
 
@@ -86,7 +86,7 @@ A green `echo ok` or a stale-but-matching digest still ships.
 **Do**
 
 - Hard cap **1.8k** on injected context (active loop, last prove OK/FAIL, one receipt line).
-- Full card stays on disk (`ebttrl context`). Hooks never paste the journal.
+- Full card stays on disk (`ebttrt context`). Hooks never paste the journal.
 - Stop-nudge once, then silent. No second sermon.
 - Doctor reports whether the last session wrote a card, not whether Grok displayed it.
 
@@ -97,12 +97,12 @@ A green `echo ok` or a stale-but-matching digest still ships.
 
 ## Phase Q5 — Reproducible activate (0.8)
 
-**Gap:** Other Mac = clone `maf4711/ebttrl` (private) then `ebttrl activate`. Receipts still cannot name a released ebttrl until there is a tag.
+**Gap:** Other Mac = clone `maf4711/ebttrt` (private) then `ebttrt activate`. Receipts still cannot name a released ebttrt until there is a tag.
 
 **Do**
 
-- Git history + version tag for ebttrl. `activate` still works from a copy.
-- Receipts store `ebttrl` version (already) **and** plugin path digest.
+- Git history + version tag for ebttrt. `activate` still works from a copy.
+- Receipts store `ebttrt` version (already) **and** plugin path digest.
 - `doctor` fails if plugin symlink ≠ discovered repo, or VERSION ≠ `plugin.json`.
 - Still no invented public URL. Remote only if you add one.
 

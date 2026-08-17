@@ -1,21 +1,21 @@
 {
-  "name": "ebttrl",
+  "name": "ebttrt",
   "description": "Even Better Than The Real Thing — Grok-native agent harness marketplace",
   "owner": {
-    "name": "ebttrl"
+    "name": "ebttrt"
   },
   "plugins": [
     {
-      "name": "ebttrl",
+      "name": "ebttrt",
       "description": "Thin Grok harness: plan → test → implement → review → verify → remember → improve",
       "category": "development",
-      "version": "0.8.0",
+      "version": "0.9.0",
       "source": {
         "type": "local",
         "path": "."
       },
       "tags": ["grok", "harness", "tdd", "review", "security"],
-      "keywords": ["ebttrl", "even better than the real thing"]
+      "keywords": ["ebttrt", "even better than the real thing"]
     }
   ]
 }

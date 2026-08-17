@@ -14,8 +14,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
-import ebttrl  # noqa: E402
-import ebttrl_activate as act  # noqa: E402
+import ebttrt  # noqa: E402
+import ebttrt_activate as act  # noqa: E402
 
 
 class Tmp(unittest.TestCase):
@@ -24,19 +24,19 @@ class Tmp(unittest.TestCase):
             key: os.environ.get(key)
             for key in (
                 "GROK_HOME",
-                "EBTTRL_HOME",
+                "EBTTRT_HOME",
                 "GROK_PLUGIN_ROOT",
-                "EBTTRL_ROOT",
+                "EBTTRT_ROOT",
                 "HOHEIT_ROOT",
-                "EBTTRL_ZSHRC",
+                "EBTTRT_ZSHRC",
             )
         }
         self.tmp = tempfile.TemporaryDirectory()
         self.home = Path(self.tmp.name)
         os.environ["GROK_HOME"] = str(self.home)
-        os.environ["EBTTRL_HOME"] = str(self.home / "ebttrl")
+        os.environ["EBTTRT_HOME"] = str(self.home / "ebttrt")
         os.environ["GROK_PLUGIN_ROOT"] = str(ROOT)
-        os.environ.pop("EBTTRL_ROOT", None)
+        os.environ.pop("EBTTRT_ROOT", None)
         self.hoheit = self.home / "hoheit"
         (self.hoheit / "scripts").mkdir(parents=True)
         (self.hoheit / "apps" / "kernel").mkdir(parents=True)
@@ -44,7 +44,7 @@ class Tmp(unittest.TestCase):
         (self.hoheit / "scripts" / "hoheit-mcp").write_text("#!/bin/sh\n", encoding="utf-8")
         (self.hoheit / "scripts" / "hoheit-prove").write_text("#!/bin/sh\n", encoding="utf-8")
         os.environ["HOHEIT_ROOT"] = str(self.hoheit)
-        os.environ["EBTTRL_ZSHRC"] = str(self.home / "zshrc")
+        os.environ["EBTTRT_ZSHRC"] = str(self.home / "zshrc")
 
     def tearDown(self) -> None:
         for key, val in self._saved.items():
@@ -57,19 +57,19 @@ class Tmp(unittest.TestCase):
 
 class DiscoveryTests(Tmp):
     def test_env_override_exclusive_miss(self) -> None:
-        os.environ["EBTTRL_ROOT"] = str(self.home / "missing")
-        self.assertIsNone(act.find_ebttrl())
+        os.environ["EBTTRT_ROOT"] = str(self.home / "missing")
+        self.assertIsNone(act.find_ebttrt())
 
     def test_env_override_hit(self) -> None:
-        os.environ["EBTTRL_ROOT"] = str(ROOT)
-        self.assertEqual(act.find_ebttrl(), ROOT)
+        os.environ["EBTTRT_ROOT"] = str(ROOT)
+        self.assertEqual(act.find_ebttrt(), ROOT)
 
     def test_hoheit_env_exclusive_miss(self) -> None:
         os.environ["HOHEIT_ROOT"] = str(self.home / "nope")
         self.assertIsNone(act.find_hoheit())
 
     def test_looks_like(self) -> None:
-        self.assertTrue(act.looks_like_ebttrl(ROOT))
+        self.assertTrue(act.looks_like_ebttrt(ROOT))
         self.assertTrue(act.looks_like_hoheit(self.hoheit))
         self.assertFalse(act.looks_like_hoheit(self.home))
 
@@ -98,7 +98,7 @@ class PortableTests(Tmp):
 
 class ActivateTests(Tmp):
     def test_missing_repo_exits_2(self) -> None:
-        os.environ["EBTTRL_ROOT"] = str(self.home / "missing")
+        os.environ["EBTTRT_ROOT"] = str(self.home / "missing")
         err = StringIO()
         with redirect_stderr(err):
             rc = act.cmd_activate()
@@ -108,14 +108,14 @@ class ActivateTests(Tmp):
     def test_activate_wires_plugin_skill_path_hoheit(self) -> None:
         out = StringIO()
         with redirect_stdout(out):
-            rc = ebttrl.main(["activate"])
+            rc = ebttrt.main(["activate"])
         self.assertEqual(rc, 0, out.getvalue())
-        self.assertTrue((self.home / "plugins" / "ebttrl").is_symlink())
-        self.assertTrue((self.home / "rules" / "ebttrl-loop.md").is_file())
-        self.assertTrue((self.home / "bin" / "ebttrl").exists())
-        skill = self.home / "skills" / "ebttrl-activate" / "SKILL.md"
+        self.assertTrue((self.home / "plugins" / "ebttrt").is_symlink())
+        self.assertTrue((self.home / "rules" / "ebttrt-loop.md").is_file())
+        self.assertTrue((self.home / "bin" / "ebttrt").exists())
+        skill = self.home / "skills" / "ebttrt-activate" / "SKILL.md"
         self.assertTrue(skill.is_file())
-        self.assertIn("ebttrl-activate", skill.read_text(encoding="utf-8"))
+        self.assertIn("ebttrt-activate", skill.read_text(encoding="utf-8"))
         zsh = (self.home / "zshrc").read_text(encoding="utf-8")
         self.assertIn(act.ZSH_PATH_LINE, zsh)
         project = (self.hoheit / ".grok" / "config.toml").read_text(encoding="utf-8")
@@ -125,7 +125,7 @@ class ActivateTests(Tmp):
         self.assertIn("hoheit-mcp", user)
         self.assertNotIn("/Users/a321", user)
         self.assertTrue(os.access(self.hoheit / "scripts" / "hoheit-prove", os.X_OK))
-        self.assertTrue((self.hoheit / ".ebttrl.json").is_file())
+        self.assertTrue((self.hoheit / ".ebttrt.json").is_file())
 
     def test_activate_is_idempotent(self) -> None:
         self.assertEqual(act.cmd_activate(), 0)
@@ -134,14 +134,14 @@ class ActivateTests(Tmp):
         self.assertEqual(zsh.count(act.ZSH_PATH_LINE), 1)
 
     def test_isolated_home_skips_real_zshrc(self) -> None:
-        os.environ.pop("EBTTRL_ZSHRC", None)
+        os.environ.pop("EBTTRT_ZSHRC", None)
         note = act.ensure_zsh_path()
         self.assertIn("isolated", note)
 
     def test_source_has_no_hardcoded_user(self) -> None:
-        text = (ROOT / "scripts" / "ebttrl_activate.py").read_text(encoding="utf-8")
+        text = (ROOT / "scripts" / "ebttrt_activate.py").read_text(encoding="utf-8")
         self.assertNotIn("/Users/", text)
-        skill = (ROOT / "skills" / "ebttrl-activate" / "SKILL.md").read_text(encoding="utf-8")
+        skill = (ROOT / "skills" / "ebttrt-activate" / "SKILL.md").read_text(encoding="utf-8")
         self.assertNotIn("/Users/a321", skill)
         self.assertNotIn("/Users/", skill)
 

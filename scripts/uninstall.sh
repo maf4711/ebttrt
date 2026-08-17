@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-exec python3 "$ROOT/scripts/ebttrl.py" uninstall
+exec python3 "$ROOT/scripts/ebttrt.py" uninstall

@@ -1,16 +1,16 @@
 {
-  "name": "ebttrl",
+  "name": "ebttrt",
   "description": "Even Better Than The Real Thing — Grok-native agent harness. Thin loop, on-demand skills, receipts, shield. Not an ECC clone.",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "author": {
-    "name": "ebttrl"
+    "name": "ebttrt"
   },
-  "homepage": "https://github.com/maf4711/ebttrl",
+  "homepage": "https://github.com/maf4711/ebttrt",
   "license": "MIT",
   "keywords": [
     "grok",
     "harness",
-    "ebttrl",
+    "ebttrt",
     "plan",
     "tdd",
     "review",
