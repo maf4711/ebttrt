@@ -1,0 +1,10 @@
+{
+  "marker": "repo2fabrik/v1",
+  "schemaVersion": 1,
+  "slug": "ebttrt",
+  "kanonischerPfad": "/Users/a321/Developer/ebttrt",
+  "codeAblage": "symlink-kanonisch",
+  "attachedAm": "2026-08-22",
+  "fabrikRoot": "/Users/a321/Developer/fabrik",
+  "tool": "company/tools/repo2fabrik.py@1.0.0"
+}
