@@ -37,13 +37,17 @@ class Tmp(unittest.TestCase):
 
 class DiscoverTests(Tmp):
     def test_config_file_wins(self) -> None:
-        (self.cwd / ".ebttrt.json").write_text('{"prove": "python3 -c \'print(1)\'"}\n', encoding="utf-8")
+        (self.cwd / ".ebttrt.json").write_text(
+            '{"prove": "python3 -c \'print(1)\'"}\n', encoding="utf-8"
+        )
         argv, via = ebttrt_prove.discover_prove(self.cwd)
         self.assertEqual(via, ".ebttrt.json")
         self.assertEqual(argv[0][:1], ["python3"])
 
     def test_package_json_test_script(self) -> None:
-        (self.cwd / "package.json").write_text('{"scripts": {"test": "node test.js"}}\n', encoding="utf-8")
+        (self.cwd / "package.json").write_text(
+            '{"scripts": {"test": "node test.js"}}\n', encoding="utf-8"
+        )
         argv, via = ebttrt_prove.discover_prove(self.cwd)
         self.assertEqual(argv, [["npm", "test"]])
         self.assertIn("package.json", via)
@@ -116,10 +120,22 @@ class ProveRunTests(Tmp):
 class ReceiptCheckTests(Tmp):
     def test_match_then_drift(self) -> None:
         subprocess.run(["git", "init"], cwd=self.cwd, check=True, capture_output=True)
-        subprocess.run(["git", "config", "user.email", "t@t"], cwd=self.cwd, check=True, capture_output=True)
-        subprocess.run(["git", "config", "user.name", "t"], cwd=self.cwd, check=True, capture_output=True)
+        subprocess.run(
+            ["git", "config", "user.email", "t@t"],
+            cwd=self.cwd,
+            check=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            ["git", "config", "user.name", "t"],
+            cwd=self.cwd,
+            check=True,
+            capture_output=True,
+        )
         (self.cwd / "f").write_text("a\n", encoding="utf-8")
-        subprocess.run(["git", "add", "f"], cwd=self.cwd, check=True, capture_output=True)
+        subprocess.run(
+            ["git", "add", "f"], cwd=self.cwd, check=True, capture_output=True
+        )
         subprocess.run(
             ["git", "-c", "commit.gpgsign=false", "commit", "-m", "i"],
             cwd=self.cwd,

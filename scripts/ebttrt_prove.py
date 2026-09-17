@@ -14,7 +14,11 @@ from typing import Any
 from ebttrt_lib import now_iso, source_state
 from ebttrt_loop import cmd_phase, journal, load_active, workspace_dir
 
-DEFAULT_TIMEOUT = int(os.environ.get("EBTTRT_PROVE_TIMEOUT") or os.environ.get("EBTTRL_PROVE_TIMEOUT") or "180")
+DEFAULT_TIMEOUT = int(
+    os.environ.get("EBTTRT_PROVE_TIMEOUT")
+    or os.environ.get("EBTTRL_PROVE_TIMEOUT")
+    or "180"
+)
 TAIL_LINES = 20
 STORED_OUT = 8000
 
@@ -73,7 +77,9 @@ def discover_prove(cwd: Path) -> tuple[list[list[str]], str]:
     pkg = cwd / "package.json"
     if pkg.is_file():
         try:
-            scripts = (json.loads(pkg.read_text(encoding="utf-8")) or {}).get("scripts") or {}
+            scripts = (json.loads(pkg.read_text(encoding="utf-8")) or {}).get(
+                "scripts"
+            ) or {}
         except json.JSONDecodeError:
             scripts = {}
         if isinstance(scripts, dict) and scripts.get("test"):
@@ -91,19 +97,21 @@ def discover_prove(cwd: Path) -> tuple[list[list[str]], str]:
             return [[sys.executable, "-m", "pytest"]], "pyproject.toml"
 
     makefile = cwd / "Makefile"
-    if makefile.is_file() and re.search(r"^test:", makefile.read_text(encoding="utf-8", errors="replace"), re.M):
+    if makefile.is_file() and re.search(
+        r"^test:", makefile.read_text(encoding="utf-8", errors="replace"), re.M
+    ):
         return [["make", "test"]], "Makefile"
 
     tests_dir = cwd / "tests"
     if tests_dir.is_dir() and any(tests_dir.glob("test_*.py")):
-        return [[sys.executable, "-m", "unittest", "discover", "-s", "tests", "-q"]], "tests/"
+        return [
+            [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-q"]
+        ], "tests/"
 
     if (cwd / "test_ebttrt.py").is_file():
         return [[sys.executable, "test_ebttrt.py"]], "test_ebttrt.py"
 
-    raise FileNotFoundError(
-        "no prove command — add {\"prove\": \"…\"} to .ebttrt.json"
-    )
+    raise FileNotFoundError('no prove command — add {"prove": "…"} to .ebttrt.json')
 
 
 def last_prove_path(cwd: Path) -> Path:
@@ -126,7 +134,9 @@ def prove_is_fresh(cwd: Path, rec: dict[str, Any] | None = None) -> bool:
     if not rec or not rec.get("ok"):
         return False
     src = source_state(cwd)
-    return rec.get("head") == src.get("head") and rec.get("dirty_digest") == src.get("dirty_digest")
+    return rec.get("head") == src.get("head") and rec.get("dirty_digest") == src.get(
+        "dirty_digest"
+    )
 
 
 def save_last_prove(cwd: Path, rec: dict[str, Any]) -> Path:
@@ -193,7 +203,9 @@ def run_prove(cwd: Path, timeout: int = DEFAULT_TIMEOUT) -> dict[str, Any]:
 
 
 def evidence_line(rec: dict[str, Any]) -> str:
-    steps = rec.get("steps") or [{"argv": rec.get("argv") or [], "code": rec.get("code")}]
+    steps = rec.get("steps") or [
+        {"argv": rec.get("argv") or [], "code": rec.get("code")}
+    ]
     bits = [" ".join(s.get("argv") or []) for s in steps]
     status = "exit 0" if rec.get("ok") else f"exit {rec.get('code')}"
     return f"{' && '.join(bits)}  {status}"
@@ -237,13 +249,17 @@ def cmd_consult(text: str, cwd: Path) -> int:
         chain, via, prove, weak = [], "none", "(set .ebttrt.json prove)", False
     print(f"goal:    {text.strip()}")
     print(f"start:   {phase}")
-    print(f"skill:   { {'plan': 'ebttrt-plan', 'test': 'ebttrt-tdd', 'implement': 'ebttrt', 'review': 'ebttrt-review'}[phase] }")
-    print(f"agent:   ebttrt:{ {'plan': 'ebttrt-planner', 'test': 'ebttrt-builder', 'implement': 'ebttrt-builder', 'review': 'ebttrt-reviewer'}[phase] }")
+    print(
+        f"skill:   { {'plan': 'ebttrt-plan', 'test': 'ebttrt-tdd', 'implement': 'ebttrt', 'review': 'ebttrt-review'}[phase] }"
+    )
+    print(
+        f"agent:   ebttrt:{ {'plan': 'ebttrt-planner', 'test': 'ebttrt-builder', 'implement': 'ebttrt-builder', 'review': 'ebttrt-reviewer'}[phase] }"
+    )
     print(f"prove:   {prove}")
     print(f"via:     {via}")
     if weak:
         print("warn:    prove looks like a no-op — prefer tests, then types/lint")
-    print(f"run:     ebttrt begin \"{text.strip()}\" --phase {phase}")
+    print(f'run:     ebttrt begin "{text.strip()}" --phase {phase}')
     return 0
 
 
@@ -263,6 +279,10 @@ def cmd_receipt_check(cwd: Path) -> int:
         print(f"receipt MATCH  {rec.get('goal')}  {(src.get('head') or '—')[:12]}")
         return 0
     print(f"receipt DRIFT  {rec.get('goal')}")
-    print(f"  receipt head   {(rec_src.get('head') or '—')[:12]}  digest={rec_src.get('dirty_digest')}")
-    print(f"  worktree head  {(src.get('head') or '—')[:12]}  digest={src.get('dirty_digest')}")
+    print(
+        f"  receipt head   {(rec_src.get('head') or '—')[:12]}  digest={rec_src.get('dirty_digest')}"
+    )
+    print(
+        f"  worktree head  {(src.get('head') or '—')[:12]}  digest={src.get('dirty_digest')}"
+    )
     return 1

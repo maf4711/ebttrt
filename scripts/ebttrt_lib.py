@@ -104,12 +104,19 @@ def plugin_digest(root: Path | None = None) -> str:
 
 def declared_versions(root: Path | None = None) -> tuple[str, str, str]:
     base = root or plugin_root()
-    file_v = (base / "VERSION").read_text(encoding="utf-8").strip() if (base / "VERSION").is_file() else ""
+    file_v = (
+        (base / "VERSION").read_text(encoding="utf-8").strip()
+        if (base / "VERSION").is_file()
+        else ""
+    )
     plug_v = ""
     manifest = base / "plugin.json"
     if manifest.is_file():
         try:
-            plug_v = str((json.loads(manifest.read_text(encoding="utf-8")) or {}).get("version") or "")
+            plug_v = str(
+                (json.loads(manifest.read_text(encoding="utf-8")) or {}).get("version")
+                or ""
+            )
         except json.JSONDecodeError:
             plug_v = ""
     return file_v, plug_v, VERSION
@@ -212,15 +219,25 @@ def deny_reason(command: str) -> str | None:
 
 
 def hook_session_start(event: dict[str, Any]) -> int:
-    from ebttrt_loop import emit_hook_context, inject_session_context, write_session_context
+    from ebttrt_loop import (
+        emit_hook_context,
+        inject_session_context,
+        write_session_context,
+    )
 
     write_session_context(event)
-    emit_hook_context("SessionStart", inject_session_context(event), INJECT_CONTEXT_CHARS)
+    emit_hook_context(
+        "SessionStart", inject_session_context(event), INJECT_CONTEXT_CHARS
+    )
     return 0
 
 
 def hook_precompact(event: dict[str, Any]) -> int:
-    from ebttrt_loop import emit_hook_context, inject_session_context, write_session_context
+    from ebttrt_loop import (
+        emit_hook_context,
+        inject_session_context,
+        write_session_context,
+    )
 
     write_session_context(event)
     emit_hook_context("PreCompact", inject_session_context(event), INJECT_CONTEXT_CHARS)
@@ -289,7 +306,9 @@ def receipt_matches(cwd: Path) -> dict[str, Any] | None:
     rec = rows[0]
     src = source_state(cwd)
     rec_src = rec.get("source") or {}
-    if rec_src.get("head") == src.get("head") and rec_src.get("dirty_digest") == src.get("dirty_digest"):
+    if rec_src.get("head") == src.get("head") and rec_src.get(
+        "dirty_digest"
+    ) == src.get("dirty_digest"):
         return rec
     return None
 
@@ -312,20 +331,28 @@ def cmd_remember(
     slug = workspace_slug(here) if workspace == "." else workspace
     if not force:
         if receipt_matches(here) is None:
-            print("need a MATCH receipt for this workspace (ebttrt done) or --force", file=sys.stderr)
+            print(
+                "need a MATCH receipt for this workspace (ebttrt done) or --force",
+                file=sys.stderr,
+            )
             return 1
     home = ensure_dirs()
     path = home / "instincts.jsonl"
     rows = read_jsonl(path)
     key = instinct_key(body)
     for item in reversed(rows):
-        if instinct_key(str(item.get("text") or "")) == key and item.get("workspace") == slug:
+        if (
+            instinct_key(str(item.get("text") or "")) == key
+            and item.get("workspace") == slug
+        ):
             prev = float(item.get("confidence") or 0)
             item["confidence"] = min(0.9, max(prev, 0.5) + 0.2)
             item["at"] = now_iso()
             item["hits"] = int(item.get("hits") or 1) + 1
             _rewrite_instincts(path, rows)
-            print(f"instinct hit {item['hits']}  confidence {item['confidence']:.2f} ({slug})")
+            print(
+                f"instinct hit {item['hits']}  confidence {item['confidence']:.2f} ({slug})"
+            )
             return 0
     item = {
         "at": now_iso(),
@@ -407,7 +434,9 @@ def cmd_receipt_write(goal: str, evidence: str, phases: list[str], cwd: Path) ->
 
 def cmd_receipt_last() -> int:
     home = ensure_dirs()
-    receipts = sorted((home / "receipts").glob("*.json"), key=lambda p: p.name, reverse=True)
+    receipts = sorted(
+        (home / "receipts").glob("*.json"), key=lambda p: p.name, reverse=True
+    )
     if not receipts:
         print("(no receipts)")
         return 0
@@ -422,11 +451,17 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
     except OSError:
         return findings
     if PEM_BEGIN.search(text):
-        findings.append({"severity": "critical", "path": str(path), "rule": "private-key"})
+        findings.append(
+            {"severity": "critical", "path": str(path), "rule": "private-key"}
+        )
     if AWS_KEY.search(text):
-        findings.append({"severity": "critical", "path": str(path), "rule": "aws-access-key"})
+        findings.append(
+            {"severity": "critical", "path": str(path), "rule": "aws-access-key"}
+        )
     if GITHUB_PAT.search(text):
-        findings.append({"severity": "critical", "path": str(path), "rule": "github-token"})
+        findings.append(
+            {"severity": "critical", "path": str(path), "rule": "github-token"}
+        )
     for i, line in enumerate(text.splitlines(), 1):
         if SECRET_LINE.search(line):
             findings.append(
@@ -448,7 +483,9 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
             )
     try:
         if path.stat().st_mode & stat.S_IWOTH:
-            findings.append({"severity": "medium", "path": str(path), "rule": "world-writable"})
+            findings.append(
+                {"severity": "medium", "path": str(path), "rule": "world-writable"}
+            )
     except OSError:
         pass
     return findings
@@ -475,7 +512,10 @@ def cmd_shield(root: Path) -> int:
             dirnames[:] = [d for d in dirnames if d not in SCAN_SKIP_DIRS]
             for name in filenames:
                 path = Path(dirpath) / name
-                if path.suffix.lower() not in SCAN_SUFFIXES and name not in {".env", "hooks.json"}:
+                if path.suffix.lower() not in SCAN_SUFFIXES and name not in {
+                    ".env",
+                    "hooks.json",
+                }:
                     continue
                 if path.stat().st_size > 1_000_000:
                     continue

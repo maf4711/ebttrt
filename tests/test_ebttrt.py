@@ -48,9 +48,13 @@ class ShieldTests(TmpHome):
 
     def test_scan_flags_secret_assignment_without_echoing_it(self) -> None:
         target = self.home / "leak.py"
-        target.write_text('API_KEY = "sk-this-is-not-real-but-long"\n', encoding="utf-8")
+        target.write_text(
+            'API_KEY = "sk-this-is-not-real-but-long"\n', encoding="utf-8"
+        )
         findings = ebttrt.scan_file(target)
-        self.assertTrue(any(f["rule"] == "assignment-looks-like-secret" for f in findings))
+        self.assertTrue(
+            any(f["rule"] == "assignment-looks-like-secret" for f in findings)
+        )
         dumped = json.dumps(findings)
         self.assertNotIn("sk-this-is-not-real-but-long", dumped)
 
@@ -74,7 +78,9 @@ class ReceiptTests(TmpHome):
     def test_receipt_roundtrip(self) -> None:
         cwd = self.home / "proj"
         cwd.mkdir()
-        rc = ebttrt.cmd_receipt_write("ship ebttrt", "python3 tests/test_ebttrt.py", ["verify"], cwd)
+        rc = ebttrt.cmd_receipt_write(
+            "ship ebttrt", "python3 tests/test_ebttrt.py", ["verify"], cwd
+        )
         self.assertEqual(rc, 0)
         receipts = list((self.home / "ebttrt" / "receipts").glob("*.json"))
         self.assertEqual(len(receipts), 1)
@@ -91,13 +97,17 @@ class ReceiptTests(TmpHome):
         there.mkdir()
         ebttrt.cmd_receipt_write("foreign", "true", ["verify"], there)
         ebttrt.cmd_receipt_write("local", "true", ["verify"], here)
-        ebttrt.hook_session_start({"workspaceRoot": str(here), "cwd": str(here), "sessionId": "s"})
+        ebttrt.hook_session_start(
+            {"workspaceRoot": str(here), "cwd": str(here), "sessionId": "s"}
+        )
         ctx = (self.home / "ebttrt" / "current-context.md").read_text(encoding="utf-8")
         self.assertIn("local", ctx)
         self.assertNotIn("foreign", ctx)
 
     def test_remember_instinct(self) -> None:
-        self.assertEqual(ebttrt.cmd_remember("prefer safari", "*", 0.8, self.home, force=True), 0)
+        self.assertEqual(
+            ebttrt.cmd_remember("prefer safari", "*", 0.8, self.home, force=True), 0
+        )
         rows = ebttrt.read_jsonl(self.home / "ebttrt" / "instincts.jsonl")
         self.assertEqual(rows[-1]["text"], "prefer safari")
         self.assertLessEqual(rows[-1]["confidence"], 0.5)
@@ -145,7 +155,11 @@ class LoopTests(TmpHome):
 
 class HookTests(TmpHome):
     def test_session_start_writes_capped_context(self) -> None:
-        event = {"workspaceRoot": str(self.home), "sessionId": "sess-1", "cwd": str(self.home)}
+        event = {
+            "workspaceRoot": str(self.home),
+            "sessionId": "sess-1",
+            "cwd": str(self.home),
+        }
         self.assertEqual(ebttrt.hook_session_start(event), 0)
         ctx = (self.home / "ebttrt" / "current-context.md").read_text(encoding="utf-8")
         self.assertIn("plan → test → implement", ctx)
@@ -157,7 +171,9 @@ class HookTests(TmpHome):
 
         buf = StringIO()
         with redirect_stdout(buf):
-            rc = ebttrt.hook_pretool({"toolInput": {"command": "security dump-keychain"}})
+            rc = ebttrt.hook_pretool(
+                {"toolInput": {"command": "security dump-keychain"}}
+            )
         self.assertEqual(rc, 2)
         payload = json.loads(buf.getvalue())
         self.assertEqual(payload["decision"], "deny")
@@ -169,7 +185,9 @@ class HookTests(TmpHome):
 
         buf = StringIO()
         with redirect_stdout(buf):
-            rc = ebttrt.hook_pretool({"toolInput": {"command": "python3 tests/test_ebttrt.py"}})
+            rc = ebttrt.hook_pretool(
+                {"toolInput": {"command": "python3 tests/test_ebttrt.py"}}
+            )
         self.assertEqual(rc, 0)
         self.assertEqual(json.loads(buf.getvalue())["decision"], "allow")
 
@@ -180,7 +198,9 @@ class HookTests(TmpHome):
         cwd = self.home / "app"
         cwd.mkdir()
         ebttrt_loop.cmd_begin("auth", cwd, "implement")
-        ebttrt_loop.note_edit({"toolName": "search_replace", "cwd": str(cwd), "workspaceRoot": str(cwd)})
+        ebttrt_loop.note_edit(
+            {"toolName": "search_replace", "cwd": str(cwd), "workspaceRoot": str(cwd)}
+        )
         buf = StringIO()
         with redirect_stdout(buf):
             rc = ebttrt.hook_stop(
@@ -193,7 +213,9 @@ class HookTests(TmpHome):
             )
         self.assertEqual(rc, 0)
         payload = json.loads(buf.getvalue())
-        self.assertIn("not verified", payload["hookSpecificOutput"]["additionalContext"])
+        self.assertIn(
+            "not verified", payload["hookSpecificOutput"]["additionalContext"]
+        )
 
     def test_stop_silent_without_loop(self) -> None:
         from io import StringIO
@@ -237,7 +259,9 @@ class HookTests(TmpHome):
         cwd = self.home / "app"
         cwd.mkdir()
         ebttrt_loop.cmd_begin("auth", cwd, "implement")
-        ebttrt.hook_session_start({"workspaceRoot": str(cwd), "cwd": str(cwd), "sessionId": "s2"})
+        ebttrt.hook_session_start(
+            {"workspaceRoot": str(cwd), "cwd": str(cwd), "sessionId": "s2"}
+        )
         ctx = (self.home / "ebttrt" / "current-context.md").read_text(encoding="utf-8")
         self.assertIn("auth", ctx)
         self.assertIn("implement", ctx)
@@ -260,7 +284,9 @@ class InstallTests(TmpHome):
 
     def test_append_enabled_does_not_duplicate(self) -> None:
         cfg = self.home / "config.toml"
-        cfg.write_text("[plugins]\nenabled = [\n    \"ruflo-core\",\n]\n", encoding="utf-8")
+        cfg.write_text(
+            '[plugins]\nenabled = [\n    "ruflo-core",\n]\n', encoding="utf-8"
+        )
         ebttrt.append_enabled_plugin()
         ebttrt.append_enabled_plugin()
         text = cfg.read_text(encoding="utf-8")

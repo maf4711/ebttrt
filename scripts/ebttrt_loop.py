@@ -137,7 +137,11 @@ def cmd_begin(goal: str, cwd: Path, phase: str = "plan") -> int:
         print(f"begin at plan, test, or implement — not {phase}", file=sys.stderr)
         return 2
     existing = load_active(cwd)
-    if existing and existing.get("goal") and existing.get("phase") not in ("remember", "improve"):
+    if (
+        existing
+        and existing.get("goal")
+        and existing.get("phase") not in ("remember", "improve")
+    ):
         print(f"open loop already: {existing.get('phase')} · {existing.get('goal')}")
         print("ebttrt abort   — drop it")
         print("ebttrt done    — close it with a receipt")
@@ -165,7 +169,7 @@ def cmd_phase(phase: str, cwd: Path, evidence: str = "") -> int:
         return 2
     active = load_active(cwd)
     if not active:
-        print("no open loop — ebttrt begin \"goal\"", file=sys.stderr)
+        print('no open loop — ebttrt begin "goal"', file=sys.stderr)
         return 1
     current = str(active.get("phase") or "")
     if phase != current and phase not in next_phases(current):
@@ -173,7 +177,10 @@ def cmd_phase(phase: str, cwd: Path, evidence: str = "") -> int:
         print(f"cannot {current} → {phase}. next: {allowed}", file=sys.stderr)
         return 1
     if phase == "remember" and not active.get("verified"):
-        print("verify first (ebttrt phase verify --evidence \"cmd + result\")", file=sys.stderr)
+        print(
+            'verify first (ebttrt phase verify --evidence "cmd + result")',
+            file=sys.stderr,
+        )
         return 1
     if phase == "verify" and evidence:
         active["verified"] = True
@@ -192,12 +199,12 @@ def cmd_next(cwd: Path) -> int:
     if not active:
         print("no open loop")
         print("next:    plan | test | implement")
-        print("run:     ebttrt begin \"goal\"")
+        print('run:     ebttrt begin "goal"')
         return 0
     print(format_loop(active))
     if not nxt:
         print("next:    done")
-        print("run:     ebttrt done --evidence \"…\"")
+        print('run:     ebttrt done --evidence "…"')
         return 0
     print(f"next:    {' | '.join(nxt)}")
     print(f"skill:   {PHASE_SKILL[nxt[0]]}")
@@ -229,7 +236,9 @@ def format_loop(active: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def emit_hook_context(event_name: str, text: str, limit: int = INJECT_CONTEXT_CHARS) -> None:
+def emit_hook_context(
+    event_name: str, text: str, limit: int = INJECT_CONTEXT_CHARS
+) -> None:
     clip = text if len(text) <= limit else text[: limit - 20] + "\n… [truncated]\n"
     sys.stdout.write(
         json.dumps(
@@ -327,7 +336,7 @@ def write_session_context(event: dict[str, Any]) -> str:
             ]
         )
     else:
-        lines.extend(["## Active loop", "(none — `ebttrt begin \"goal\"`)", ""])
+        lines.extend(["## Active loop", '(none — `ebttrt begin "goal"`)', ""])
     lines.append("## Last prove")
     if last_prove:
         lines.append(
@@ -342,7 +351,9 @@ def write_session_context(event: dict[str, Any]) -> str:
     for rec in receipts:
         head = ((rec.get("source") or {}).get("head") or "—")[:12]
         digest = (rec.get("source") or {}).get("dirty_digest") or "clean"
-        lines.append(f"- {rec.get('at', '?')} · {rec.get('goal', '(no goal)')} · {head} · {digest}")
+        lines.append(
+            f"- {rec.get('at', '?')} · {rec.get('goal', '(no goal)')} · {head} · {digest}"
+        )
     lines.extend(["", "## Journal"])
     events = read_journal(cwd, 5)
     if not events:
@@ -353,7 +364,9 @@ def write_session_context(event: dict[str, Any]) -> str:
     if not instincts:
         lines.append("(none)")
     for item in instincts:
-        lines.append(f"- ({item.get('confidence', 0.5):.2f}) {item.get('text', '').strip()}")
+        lines.append(
+            f"- ({item.get('confidence', 0.5):.2f}) {item.get('text', '').strip()}"
+        )
     text = "\n".join(lines) + "\n"
     if len(text) > MAX_CONTEXT_CHARS:
         text = text[: MAX_CONTEXT_CHARS - 20] + "\n… [truncated]\n"
@@ -414,7 +427,13 @@ def _upsert_memory(path: Path, line: str) -> None:
     if line in existing:
         return
     if "## ebttrt" not in existing:
-        block = existing.rstrip() + ("\n\n" if existing.strip() else "") + "## ebttrt\n" + line + "\n"
+        block = (
+            existing.rstrip()
+            + ("\n\n" if existing.strip() else "")
+            + "## ebttrt\n"
+            + line
+            + "\n"
+        )
     else:
         block = existing.rstrip() + "\n" + line + "\n"
     path.write_text(block, encoding="utf-8")
@@ -435,7 +454,11 @@ def note_edit(event: dict[str, Any]) -> int:
 
 
 def stop_nudge_enabled() -> bool:
-    return (os.environ.get("EBTTRT_STOP_NUDGE") or os.environ.get("EBTTRL_STOP_NUDGE") or "1") not in {
+    return (
+        os.environ.get("EBTTRT_STOP_NUDGE")
+        or os.environ.get("EBTTRL_STOP_NUDGE")
+        or "1"
+    ) not in {
         "0",
         "false",
         "off",
@@ -458,7 +481,9 @@ def should_nudge(event: dict[str, Any], active: dict[str, Any] | None) -> bool:
         return False
     if active.get("verified"):
         return False
-    message = str(event.get("lastAssistantMessage") or event.get("last_assistant_message") or "")
+    message = str(
+        event.get("lastAssistantMessage") or event.get("last_assistant_message") or ""
+    )
     if DONE_RX.search(message):
         return True
     return int(active.get("edits") or 0) > 0 and bool(
@@ -476,7 +501,7 @@ def hook_stop(event: dict[str, Any]) -> int:
         "hookSpecificOutput": {
             "hookEventName": "Stop",
             "additionalContext": (
-                f"ebttrt: open loop \"{active.get('goal')}\" is still in {active.get('phase')} "
+                f'ebttrt: open loop "{active.get("goal")}" is still in {active.get("phase")} '
                 "and is not verified. Do not claim done. Run `ebttrt prove --record`, then "
                 "`ebttrt done`."
             ),
