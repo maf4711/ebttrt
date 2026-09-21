@@ -40,12 +40,24 @@ class Tmp(unittest.TestCase):
 
     def git_init(self) -> None:
         subprocess.run(["git", "init"], cwd=self.cwd, check=True, capture_output=True)
-        subprocess.run(["git", "config", "user.email", "t@t"], cwd=self.cwd, check=True, capture_output=True)
-        subprocess.run(["git", "config", "user.name", "t"], cwd=self.cwd, check=True, capture_output=True)
+        subprocess.run(
+            ["git", "config", "user.email", "t@t"],
+            cwd=self.cwd,
+            check=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            ["git", "config", "user.name", "t"],
+            cwd=self.cwd,
+            check=True,
+            capture_output=True,
+        )
 
     def commit(self, name: str, body: str) -> None:
         (self.cwd / name).write_text(body, encoding="utf-8")
-        subprocess.run(["git", "add", name], cwd=self.cwd, check=True, capture_output=True)
+        subprocess.run(
+            ["git", "add", name], cwd=self.cwd, check=True, capture_output=True
+        )
         subprocess.run(
             ["git", "-c", "commit.gpgsign=false", "commit", "-m", name],
             cwd=self.cwd,
@@ -69,7 +81,9 @@ class ProveQuality(Tmp):
 
     def test_chain_stops_on_fail(self) -> None:
         (self.cwd / ".ebttrt.json").write_text(
-            json.dumps({"prove": ['python3 -c "raise SystemExit(2)"', 'python3 -c "print(1)"']}),
+            json.dumps(
+                {"prove": ['python3 -c "raise SystemExit(2)"', 'python3 -c "print(1)"']}
+            ),
             encoding="utf-8",
         )
         rec = ebttrt_prove.run_prove(self.cwd)
@@ -115,10 +129,14 @@ class InstinctQuality(Tmp):
     def test_first_low_second_promotes(self) -> None:
         ebttrt.cmd_receipt_write("one", "true", ["verify"], self.cwd)
         ebttrt.cmd_receipt_write("two", "true", ["verify"], self.cwd)
-        self.assertEqual(ebttrt.cmd_remember("keep safari default", "*", 0.8, self.cwd), 0)
+        self.assertEqual(
+            ebttrt.cmd_remember("keep safari default", "*", 0.8, self.cwd), 0
+        )
         rows = ebttrt.read_jsonl(self.home / "ebttrt" / "instincts.jsonl")
         self.assertLessEqual(rows[-1]["confidence"], 0.5)
-        self.assertEqual(ebttrt.cmd_remember("keep safari default", "*", 0.8, self.cwd), 0)
+        self.assertEqual(
+            ebttrt.cmd_remember("keep safari default", "*", 0.8, self.cwd), 0
+        )
         rows = ebttrt.read_jsonl(self.home / "ebttrt" / "instincts.jsonl")
         self.assertEqual(len(rows), 1)
         self.assertGreater(rows[0]["confidence"], 0.5)
@@ -128,7 +146,9 @@ class InstinctQuality(Tmp):
         self.assertIn("keep safari default", buf.getvalue())
 
     def test_secret_instinct_refused(self) -> None:
-        rc = ebttrt.cmd_remember('API_KEY = "sk-not-a-real-key-xx"', "*", 0.5, self.cwd, force=True)
+        rc = ebttrt.cmd_remember(
+            'API_KEY = "sk-not-a-real-key-xx"', "*", 0.5, self.cwd, force=True
+        )
         self.assertEqual(rc, 2)
 
 
@@ -191,7 +211,9 @@ class ContextQuality(Tmp):
         self.assertNotIn("## Instincts", inject)
         self.assertLessEqual(len(inject), ebttrt_lib.INJECT_CONTEXT_CHARS)
         self.assertIn("auth", inject)
-        meta = json.loads((self.home / "ebttrt" / "last-context.json").read_text(encoding="utf-8"))
+        meta = json.loads(
+            (self.home / "ebttrt" / "last-context.json").read_text(encoding="utf-8")
+        )
         self.assertLessEqual(int(meta["inject_bytes"]), ebttrt_lib.INJECT_CONTEXT_CHARS)
 
 

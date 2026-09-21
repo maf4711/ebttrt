@@ -24,7 +24,9 @@ def looks_like_ebttrt(path: Path) -> bool:
 
 
 def looks_like_hoheit(path: Path) -> bool:
-    return (path / "scripts" / "hoheit").is_file() and (path / "apps" / "kernel").is_dir()
+    return (path / "scripts" / "hoheit").is_file() and (
+        path / "apps" / "kernel"
+    ).is_dir()
 
 
 def find_ebttrt() -> Path | None:
@@ -191,8 +193,13 @@ def cmd_activate() -> int:
     repo = find_ebttrt()
     if repo is None:
         print("ebttrt repo not found on this Mac.", file=sys.stderr)
-        print("clone https://github.com/maf4711/ebttrt.git to ~/Developer/ebttrt, then:", file=sys.stderr)
-        print("  python3 ~/Developer/ebttrt/scripts/ebttrt.py activate", file=sys.stderr)
+        print(
+            "clone https://github.com/maf4711/ebttrt.git to ~/Developer/ebttrt, then:",
+            file=sys.stderr,
+        )
+        print(
+            "  python3 ~/Developer/ebttrt/scripts/ebttrt.py activate", file=sys.stderr
+        )
         return 2
     os.environ["GROK_PLUGIN_ROOT"] = str(repo)
     from ebttrt import cmd_install

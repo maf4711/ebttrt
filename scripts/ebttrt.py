@@ -162,22 +162,30 @@ def cmd_doctor() -> int:
         issues.append(f"CLI not on PATH via {cli}")
     file_v, plug_v, code_v = declared_versions(root)
     if not file_v or {file_v, plug_v, code_v} != {file_v}:
-        issues.append(f"version drift VERSION={file_v!r} plugin.json={plug_v!r} code={code_v!r}")
+        issues.append(
+            f"version drift VERSION={file_v!r} plugin.json={plug_v!r} code={code_v!r}"
+        )
     if link.exists() and not link.is_symlink():
         issues.append(f"plugin at {link} is not a symlink")
     elif link.is_symlink() and link.resolve() != root.resolve():
         issues.append(f"plugin symlink {link} → {link.resolve()} != {root}")
-    isolated = Path(os.environ.get("GROK_HOME") or grok_home()) != (Path.home() / ".grok")
+    isolated = Path(os.environ.get("GROK_HOME") or grok_home()) != (
+        Path.home() / ".grok"
+    )
     plugin = None if isolated else inspect_plugin()
     if not isolated:
         if plugin is None:
-            issues.append("grok inspect did not list plugin ebttrt (new session / press r)")
+            issues.append(
+                "grok inspect did not list plugin ebttrt (new session / press r)"
+            )
         else:
             if not plugin.get("enabled", True):
                 issues.append("plugin ebttrt is disabled")
             skills = (plugin.get("provides") or {}).get("skills")
             if isinstance(skills, int) and skills < MIN_GROK_SKILLS:
-                issues.append(f"grok sees {skills} ebttrt skills, expected {MIN_GROK_SKILLS}+")
+                issues.append(
+                    f"grok sees {skills} ebttrt skills, expected {MIN_GROK_SKILLS}+"
+                )
     if issues:
         print("ebttrt doctor: FAIL")
         for item in issues:
@@ -194,14 +202,18 @@ def cmd_doctor() -> int:
     if meta.is_file():
         try:
             info = json.loads(meta.read_text(encoding="utf-8"))
-            print(f"  card    {info.get('at')} inject={info.get('inject_bytes')} disk={info.get('disk_bytes')}")
+            print(
+                f"  card    {info.get('at')} inject={info.get('inject_bytes')} disk={info.get('disk_bytes')}"
+            )
         except json.JSONDecodeError:
             pass
     if plugin:
         print(f"  grok   enabled, {plugin.get('provides')}")
         seen = (plugin.get("provides") or {}).get("skills")
         if isinstance(seen, int) and seen < disk_skills:
-            print(f"  note   grok inspect sees {seen} skills, disk has {disk_skills} — press r")
+            print(
+                f"  note   grok inspect sees {seen} skills, disk has {disk_skills} — press r"
+            )
     return 0
 
 
@@ -233,7 +245,7 @@ def cmd_context() -> int:
 def cmd_done(evidence: str, cwd: Path) -> int:
     active = load_active(cwd)
     if not active:
-        print("no open loop — ebttrt begin \"goal\"", file=sys.stderr)
+        print('no open loop — ebttrt begin "goal"', file=sys.stderr)
         return 1
     last = load_last_prove(cwd)
     if not last or not last.get("ok") or not prove_is_fresh(cwd, last):
@@ -270,7 +282,9 @@ def cmd_eval() -> int:
         cwd=root,
         check=False,
     )
-    print(f"eval: {'OK' if proc.returncode == 0 else 'FAIL'}  unittest discover -s tests")
+    print(
+        f"eval: {'OK' if proc.returncode == 0 else 'FAIL'}  unittest discover -s tests"
+    )
     return proc.returncode
 
 
@@ -285,7 +299,9 @@ def append_enabled_plugin() -> None:
         cfg.write_text(text, encoding="utf-8")
         return
     if "[plugins]" not in text:
-        cfg.write_text(text.rstrip() + '\n\n[plugins]\nenabled = ["ebttrt"]\n', encoding="utf-8")
+        cfg.write_text(
+            text.rstrip() + '\n\n[plugins]\nenabled = ["ebttrt"]\n', encoding="utf-8"
+        )
         return
     updated, n = re.subn(
         r"(\[plugins\][^\[]*enabled\s*=\s*\[)",
@@ -319,7 +335,10 @@ def cmd_install() -> int:
         if stale.is_symlink() or stale.is_file():
             stale.unlink()
     rule_dst = home / "rules" / "ebttrt-loop.md"
-    rule_dst.write_text((root / "rules" / "ebttrt-loop.md").read_text(encoding="utf-8"), encoding="utf-8")
+    rule_dst.write_text(
+        (root / "rules" / "ebttrt-loop.md").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
     cli = home / "bin" / "ebttrt"
     if cli.is_symlink() or cli.exists():
         cli.unlink()
@@ -367,7 +386,9 @@ def cmd_receipt_last_workspace(cwd: Path) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="ebttrt", description="Even Better Than The Real Thing")
+    p = argparse.ArgumentParser(
+        prog="ebttrt", description="Even Better Than The Real Thing"
+    )
     p.add_argument("--version", action="version", version=f"ebttrt {VERSION}")
     sub = p.add_subparsers(dest="cmd", required=False)
     for name, help_ in (
@@ -420,7 +441,14 @@ def build_parser() -> argparse.ArgumentParser:
     hk = sub.add_parser("hook", help="internal: Grok lifecycle hook")
     hk.add_argument(
         "name",
-        choices=("session-start", "session-end", "pretool", "posttool", "stop", "precompact"),
+        choices=(
+            "session-start",
+            "session-end",
+            "pretool",
+            "posttool",
+            "stop",
+            "precompact",
+        ),
     )
     return p
 
@@ -459,7 +487,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "abort":
         return cmd_abort(cwd)
     if args.cmd == "prove":
-        return cmd_prove(cwd, record=args.record, timeout=args.timeout or DEFAULT_TIMEOUT)
+        return cmd_prove(
+            cwd, record=args.record, timeout=args.timeout or DEFAULT_TIMEOUT
+        )
     if args.cmd == "consult":
         return cmd_consult(" ".join(args.text), cwd)
     if args.cmd == "eval":

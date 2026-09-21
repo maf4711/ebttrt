@@ -41,8 +41,12 @@ class Tmp(unittest.TestCase):
         (self.hoheit / "scripts").mkdir(parents=True)
         (self.hoheit / "apps" / "kernel").mkdir(parents=True)
         (self.hoheit / "scripts" / "hoheit").write_text("#!/bin/sh\n", encoding="utf-8")
-        (self.hoheit / "scripts" / "hoheit-mcp").write_text("#!/bin/sh\n", encoding="utf-8")
-        (self.hoheit / "scripts" / "hoheit-prove").write_text("#!/bin/sh\n", encoding="utf-8")
+        (self.hoheit / "scripts" / "hoheit-mcp").write_text(
+            "#!/bin/sh\n", encoding="utf-8"
+        )
+        (self.hoheit / "scripts" / "hoheit-prove").write_text(
+            "#!/bin/sh\n", encoding="utf-8"
+        )
         os.environ["HOHEIT_ROOT"] = str(self.hoheit)
         os.environ["EBTTRT_ZSHRC"] = str(self.home / "zshrc")
 
@@ -133,7 +137,9 @@ class ActivateTests(Tmp):
         (leftover / "SKILL.md").write_text("# old\n", encoding="utf-8")
         self.assertEqual(act.cmd_activate(), 0)
         self.assertFalse(leftover.exists())
-        self.assertTrue((self.home / "skills" / "ebttrt-activate" / "SKILL.md").is_file())
+        self.assertTrue(
+            (self.home / "skills" / "ebttrt-activate" / "SKILL.md").is_file()
+        )
 
     def test_activate_is_idempotent(self) -> None:
         self.assertEqual(act.cmd_activate(), 0)
@@ -149,7 +155,9 @@ class ActivateTests(Tmp):
     def test_source_has_no_hardcoded_user(self) -> None:
         text = (ROOT / "scripts" / "ebttrt_activate.py").read_text(encoding="utf-8")
         self.assertNotIn("/Users/", text)
-        skill = (ROOT / "skills" / "ebttrt-activate" / "SKILL.md").read_text(encoding="utf-8")
+        skill = (ROOT / "skills" / "ebttrt-activate" / "SKILL.md").read_text(
+            encoding="utf-8"
+        )
         self.assertNotIn("/Users/a321", skill)
         self.assertNotIn("/Users/", skill)
 

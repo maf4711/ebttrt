@@ -54,7 +54,9 @@ def review_fresh(cwd: Path, rec: dict[str, Any] | None = None) -> bool:
     if not rec:
         return False
     src = source_state(cwd)
-    return rec.get("head") == src.get("head") and rec.get("dirty_digest") == src.get("dirty_digest")
+    return rec.get("head") == src.get("head") and rec.get("dirty_digest") == src.get(
+        "dirty_digest"
+    )
 
 
 def high_findings(rec: dict[str, Any]) -> bool:
@@ -81,11 +83,17 @@ def parse_finding(raw: str) -> dict[str, str]:
     # severity:path:message
     parts = raw.split(":", 2)
     if len(parts) == 3:
-        return {"severity": parts[0].strip(), "path": parts[1].strip(), "message": parts[2].strip()}
+        return {
+            "severity": parts[0].strip(),
+            "path": parts[1].strip(),
+            "message": parts[2].strip(),
+        }
     return {"severity": "info", "path": "", "message": raw.strip()}
 
 
-def cmd_review(cwd: Path, verdict: str = "approve", findings: list[str] | None = None) -> int:
+def cmd_review(
+    cwd: Path, verdict: str = "approve", findings: list[str] | None = None
+) -> int:
     if verdict not in {"approve", "revise"}:
         print("verdict must be approve or revise", file=sys.stderr)
         return 2
@@ -104,7 +112,9 @@ def cmd_review(cwd: Path, verdict: str = "approve", findings: list[str] | None =
     }
     path = last_review_path(cwd)
     path.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8")
-    journal(cwd, "review", verdict=verdict, required=rec["required"], findings=len(parsed))
+    journal(
+        cwd, "review", verdict=verdict, required=rec["required"], findings=len(parsed)
+    )
     print(f"review:  {verdict}  {rec['path_count']} path(s)  {path}")
     if rec["required"] and verdict == "revise" and high_findings(rec):
         print("blocks:  done/remember until re-review")
